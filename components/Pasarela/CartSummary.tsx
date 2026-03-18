@@ -1,8 +1,8 @@
 import React from "react";
 import { View } from "react-native";
+import { ShoppingBag, Receipt, Tag } from "lucide-react-native";
 import { PayText } from "./PayText";
 import "@/global.css";
-
 
 export interface CartItem {
   id: string;
@@ -16,7 +16,7 @@ interface CartSummaryProps {
 }
 
 const formatCurrency = (amount: number) =>
-  `$ ${amount.toLocaleString("es-AR", { minimumFractionDigits: 2 })} (Fichas)`;
+  `$ ${amount.toLocaleString("es-AR", { minimumFractionDigits: 2 })}`;
 
 export const CartSummary = ({ items }: CartSummaryProps) => {
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
@@ -25,9 +25,12 @@ export const CartSummary = ({ items }: CartSummaryProps) => {
 
   return (
     <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
-      <PayText variant="label" className="mb-3 uppercase tracking-wide">
-        🛍️ Resumen del pedido
-      </PayText>
+      <View className="flex-row items-center gap-2 mb-3">
+        <ShoppingBag size={16} color="#6b7280" />
+        <PayText variant="label" className="uppercase tracking-wide">
+          Resumen del pedido
+        </PayText>
+      </View>
 
       {items.map((item) => (
         <View
@@ -45,16 +48,25 @@ export const CartSummary = ({ items }: CartSummaryProps) => {
       ))}
 
       <View className="mt-3 pt-2 gap-1">
-        <View className="flex-row justify-between">
-          <PayText variant="caption" className="text-left">Subtotal</PayText>
+        <View className="flex-row justify-between items-center">
+          <View className="flex-row items-center gap-1">
+            <Tag size={12} color="#9ca3af" />
+            <PayText variant="caption" className="text-left">Subtotal</PayText>
+          </View>
           <PayText variant="body">{formatCurrency(subtotal)}</PayText>
         </View>
-        <View className="flex-row justify-between">
-          <PayText variant="caption" className="text-left">IVA (10.5%)</PayText>
+        <View className="flex-row justify-between items-center">
+          <View className="flex-row items-center gap-1">
+            <Tag size={12} color="#9ca3af" />
+            <PayText variant="caption" className="text-left">IVA (10.5%)</PayText>
+          </View>
           <PayText variant="body">{formatCurrency(tax)}</PayText>
         </View>
-        <View className="flex-row justify-between mt-2 pt-2 border-t border-gray-100">
-          <PayText variant="body" className="font-bold text-gray-900 text-base">Total</PayText>
+        <View className="flex-row justify-between items-center mt-2 pt-2 border-t border-gray-100">
+          <View className="flex-row items-center gap-1">
+            <Receipt size={14} color="#111827" />
+            <PayText variant="body" className="font-bold text-gray-900 text-base">Total</PayText>
+          </View>
           <PayText variant="price">{formatCurrency(total)}</PayText>
         </View>
       </View>
