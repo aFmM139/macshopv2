@@ -1,31 +1,40 @@
-import { View, Text, TextInput } from "react-native";
-import { useState } from "react";
+import { View, Text } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import QRCode from "react-native-qrcode-svg";
+import { ScanBarcode } from "lucide-react-native";
 
 export default function QRScreen() {
-  const [text, setText] = useState("");
+  const { id, title, price, brand } = useLocalSearchParams();
+
+  const qrValue = id
+    ? JSON.stringify({ id, title, price, brand })
+    : "";
 
   return (
     <View className="flex-1 justify-center items-center bg-gray-100 px-6">
 
-      <Text className="text-2xl font-bold mb-6">
-        Generador de QR
-      </Text>
+      <View className="flex-row items-center gap-2 mb-2">
+        <ScanBarcode size={28} color="black" />
+        <Text className="text-2xl font-bold">Código QR</Text>
+      </View>
 
-      <TextInput
-        placeholder="Escribe algo..."
-        value={text}
-        onChangeText={setText}
-        className="w-full bg-white border border-gray-300 rounded-xl p-4"
-      />
+      {qrValue ? (
+        <>
+          <Text className="text-lg font-semibold mb-1">{title}</Text>
+          <Text className="text-gray-500 mb-6">${price}</Text>
 
-      {text.length > 0 && (
-        <View className="mt-8 bg-white p-6 rounded-2xl">
-          <QRCode
-            value={text}
-            size={220}
-          />
-        </View>
+          <View className="bg-white p-6 rounded-2xl">
+            <QRCode value={qrValue} size={220} />
+          </View>
+
+          <Text className="text-xs text-gray-400 mt-4 text-center">
+            {qrValue}
+          </Text>
+        </>
+      ) : (
+        <Text className="text-gray-400">
+          Selecciona un producto desde la tienda
+        </Text>
       )}
 
     </View>
