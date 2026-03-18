@@ -1,20 +1,20 @@
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
+import { LucideIcon } from "lucide-react-native";
 import { PayText } from "./PayText";
 import "@/global.css";
-
 
 export type PaymentMethod = "card" | "paypal" | "mercadopago";
 
 interface MethodButtonProps {
   label: string;
-  icon: string;
+  icon: LucideIcon;
   value: PaymentMethod;
   selected: PaymentMethod;
   onPress: (v: PaymentMethod) => void;
 }
 
-export const MethodButton = ({ label, icon, value, selected, onPress }: MethodButtonProps) => {
+export const MethodButton = ({ label, icon: Icon, value, selected, onPress }: MethodButtonProps) => {
   const isSelected = selected === value;
   return (
     <TouchableOpacity
@@ -24,7 +24,9 @@ export const MethodButton = ({ label, icon, value, selected, onPress }: MethodBu
       }`}
       activeOpacity={0.8}
     >
-      <PayText variant="body" className="text-2xl mb-1">{icon}</PayText>
+      <View className="mb-1">
+        <Icon size={24} color={isSelected ? "#6366f1" : "#9ca3af"} />
+      </View>
       <PayText
         variant="label"
         className={isSelected ? "text-indigo-600" : "text-gray-500"}
