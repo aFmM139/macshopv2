@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import {View,Alert,KeyboardAvoidingView,Platform,ScrollView} from "react-native";
-import {CreditCard,Wallet,BadgeDollarSign,ShieldCheck,} from "lucide-react-native";
+import {
+  View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
+import { CreditCard, Wallet, BadgeDollarSign, ShieldCheck } from "lucide-react-native";
+
 import { PayText } from "@/components/Pasarela/PayText";
 import { PayButton } from "@/components/Pasarela/PayButton";
 import { CardForm, CardData } from "@/components/Pasarela/CardForm";
@@ -8,6 +15,7 @@ import { MethodButton, PaymentMethod } from "@/components/Pasarela/MethodButton"
 import { CartSummary, CartItem, formatCurrency } from "@/components/Pasarela/CartSummary";
 import { CartManager } from "@/components/Pasarela/CartManager";
 import { ResultModal } from "@/components/Pasarela/ResultModal";
+import { useNotifications, savePaymentAndNotify } from "@/lib/Usepaymentnotification";
 
 const CART_ITEMS: CartItem[] = [
   { id: "1", name: "Auriculares Pro Max", price: 12500, qty: 1 },
@@ -19,7 +27,7 @@ const simulatePayment = (method: PaymentMethod): Promise<{ success: boolean; tok
   new Promise((resolve) =>
     setTimeout(() => {
       const success = Math.random() > 0.1;
-      resolve({ success, token: success ? `SIM_${method.toUpperCase()}_${Date.now()}` : "" });
+      resolve({ success, token: success ? `TXN_${method.toUpperCase()}_${Date.now()}` : "" });
     }, 2200)
   );
 
@@ -51,7 +59,7 @@ const ExternalMethodPanel = ({ method }: { method: PaymentMethod }) => {
             {config.title}
           </PayText>
           <PayText variant="caption" className="text-left text-gray-500">
-            Pago externo simulado
+            Pago externo seguro
           </PayText>
         </View>
       </View>
@@ -61,6 +69,8 @@ const ExternalMethodPanel = ({ method }: { method: PaymentMethod }) => {
 };
 
 export default function PayP() {
+  useNotifications();
+
   const [items, setItems] = useState<CartItem[]>(CART_ITEMS);
   const [method, setMethod] = useState<PaymentMethod>("card");
   const [card, setCard] = useState<CardData>({ number: "", name: "", expiry: "", cvv: "" });
@@ -92,6 +102,16 @@ export default function PayP() {
     setLoading(true);
     const res = await simulatePayment(method);
     setLoading(false);
+
+    if (res.success) {
+      await savePaymentAndNotify({
+        method,
+        total: totalWithTax,
+        token: res.token,
+        items: items.map(({ name, price, qty }) => ({ name, price, qty })),
+      });
+    }
+
     setResult({ visible: true, success: res.success, token: res.token });
   };
 
@@ -111,23 +131,17 @@ export default function PayP() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <PayText variant="title" className="mb-1">Checkout</PayText>
         <PayText variant="subtitle" className="mb-4">Completa tu compra de forma segura</PayText>
 
-        {/* Badge simulación */}
         <View className="bg-indigo-100 rounded-full px-3 py-1 self-center mb-4 flex-row items-center gap-1">
           <BadgeDollarSign size={14} color="#4338ca" />
           <PayText variant="badge" className="text-indigo-800">Pago 100% Seguro</PayText>
         </View>
 
-        {/* Gestor de productos */}
         <CartManager items={items} onItemsChange={setItems} />
-
-        {/* Resumen carrito */}
         <CartSummary items={items} />
 
-        {/* Método de pago */}
         <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
           <View className="flex-row items-center gap-2 mb-3">
             <CreditCard size={16} color="#6b7280" />
@@ -148,7 +162,6 @@ export default function PayP() {
           }
         </View>
 
-        {/* Botón de pago */}
         <PayButton
           label={`Pagar ${formatCurrency(totalWithTax)}`}
           onPress={handlePay}
@@ -156,11 +169,10 @@ export default function PayP() {
           disabled={!isCardValid || items.length === 0}
         />
 
-        {/* Nota seguridad */}
         <View className="flex-row items-center justify-center gap-1 mt-4">
           <ShieldCheck size={12} color="#9ca3af" />
           <PayText variant="caption">
-                Cifrado SSL · Datos protegidos · Transacción segura
+            Cifrado SSL · Datos protegidos · Transacción segura
           </PayText>
         </View>
       </ScrollView>
