@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import {View,Alert,KeyboardAvoidingView,Platform,ScrollView} from "react-native";
-import {CreditCard,Wallet,BadgeDollarSign,ShieldCheck,} from "lucide-react-native";
+import { View, Alert, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { CreditCard, Wallet, BadgeDollarSign, ShieldCheck } from "lucide-react-native";
 import { PayText } from "@/components/Pasarela/PayText";
 import { PayButton } from "@/components/Pasarela/PayButton";
 import { CardForm, CardData } from "@/components/Pasarela/CardForm";
@@ -8,12 +8,7 @@ import { MethodButton, PaymentMethod } from "@/components/Pasarela/MethodButton"
 import { CartSummary, CartItem, formatCurrency } from "@/components/Pasarela/CartSummary";
 import { CartManager } from "@/components/Pasarela/CartManager";
 import { ResultModal } from "@/components/Pasarela/ResultModal";
-
-const CART_ITEMS: CartItem[] = [
-  { id: "1", name: "Auriculares Pro Max", price: 12500, qty: 1 },
-  { id: "2", name: "Cable USB-C Trenzado", price: 850, qty: 2 },
-  { id: "3", name: "Funda Silicona", price: 320, qty: 1 },
-];
+import { useCart } from "@/Context/CartContext";
 
 const simulatePayment = (method: PaymentMethod): Promise<{ success: boolean; token: string }> =>
   new Promise((resolve) =>
@@ -61,7 +56,7 @@ const ExternalMethodPanel = ({ method }: { method: PaymentMethod }) => {
 };
 
 export default function PayP() {
-  const [items, setItems] = useState<CartItem[]>(CART_ITEMS);
+  const { items, setItems } = useCart();
   const [method, setMethod] = useState<PaymentMethod>("card");
   const [card, setCard] = useState<CardData>({ number: "", name: "", expiry: "", cvv: "" });
   const [loading, setLoading] = useState(false);
@@ -97,7 +92,10 @@ export default function PayP() {
 
   const handleClose = () => {
     setResult({ visible: false, success: false, token: "" });
-    if (result.success) setCard({ number: "", name: "", expiry: "", cvv: "" });
+    if (result.success) {
+      setCard({ number: "", name: "", expiry: "", cvv: "" });
+      setItems([]); // limpia el carrito al pagar exitosamente
+    }
   };
 
   return (
@@ -160,7 +158,7 @@ export default function PayP() {
         <View className="flex-row items-center justify-center gap-1 mt-4">
           <ShieldCheck size={12} color="#9ca3af" />
           <PayText variant="caption">
-                Cifrado SSL · Datos protegidos · Transacción segura
+            Cifrado SSL · Datos protegidos · Transacción segura
           </PayText>
         </View>
       </ScrollView>
