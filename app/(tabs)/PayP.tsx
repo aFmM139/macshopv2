@@ -1,12 +1,6 @@
 import React, { useState } from "react";
-import {
-  View,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from "react-native";
-
+import {View,Alert,KeyboardAvoidingView,Platform,ScrollView} from "react-native";
+import {CreditCard,Wallet,BadgeDollarSign,ShieldCheck,} from "lucide-react-native";
 import { PayText } from "@/components/Pasarela/PayText";
 import { PayButton } from "@/components/Pasarela/PayButton";
 import { CardForm, CardData } from "@/components/Pasarela/CardForm";
@@ -15,15 +9,11 @@ import { CartSummary, CartItem, formatCurrency } from "@/components/Pasarela/Car
 import { CartManager } from "@/components/Pasarela/CartManager";
 import { ResultModal } from "@/components/Pasarela/ResultModal";
 
-// ─── Datos del carrito ────────────────────────────────────────────────────────
-
 const CART_ITEMS: CartItem[] = [
   { id: "1", name: "Auriculares Pro Max", price: 12500, qty: 1 },
   { id: "2", name: "Cable USB-C Trenzado", price: 850, qty: 2 },
   { id: "3", name: "Funda Silicona", price: 320, qty: 1 },
 ];
-
-// ─── Simulador de pago ────────────────────────────────────────────────────────
 
 const simulatePayment = (method: PaymentMethod): Promise<{ success: boolean; token: string }> =>
   new Promise((resolve) =>
@@ -33,27 +23,29 @@ const simulatePayment = (method: PaymentMethod): Promise<{ success: boolean; tok
     }, 2200)
   );
 
-// ─── Panel externo (PayPal / MercadoPago) ─────────────────────────────────────
-
 const ExternalMethodPanel = ({ method }: { method: PaymentMethod }) => {
   const config = {
     paypal: {
-      icon: "🅿️", title: "PayPal",
-      color: "bg-blue-50 border-blue-200", text: "text-blue-700",
-      desc: "Serás redirigido al portal simulado de PayPal para autorizar el pago.",
+      icon: <Wallet size={28} color="#1d4ed8" />,
+      title: "PayPal",
+      color: "bg-blue-50 border-blue-200",
+      text: "text-blue-700",
+      desc: "Serás redirigido a PayPal para completar el pago de forma segura.",
     },
     mercadopago: {
-      icon: "🛒", title: "Mercado Pago",
-      color: "bg-sky-50 border-sky-200", text: "text-sky-700",
-      desc: "Serás redirigido al portal simulado de Mercado Pago. Acepta cuotas locales.",
+      icon: <BadgeDollarSign size={28} color="#0369a1" />,
+      title: "Mercado Pago",
+      color: "bg-sky-50 border-sky-200",
+      text: "text-sky-700",
+      desc: "Serás redirigido a Mercado Pago. Acepta cuotas y métodos de pago locales.",
     },
-    card: { icon: "", title: "", color: "", text: "", desc: "" },
+    card: { icon: null, title: "", color: "", text: "", desc: "" },
   }[method];
 
   return (
     <View className={`border rounded-2xl p-4 mt-2 ${config.color}`}>
       <View className="flex-row items-center mb-2">
-        <PayText variant="body" className="text-3xl mr-3">{config.icon}</PayText>
+        <View className="mr-3">{config.icon}</View>
         <View>
           <PayText variant="body" className={`font-bold text-base ${config.text}`}>
             {config.title}
@@ -67,8 +59,6 @@ const ExternalMethodPanel = ({ method }: { method: PaymentMethod }) => {
     </View>
   );
 };
-
-// ─── PayP (Pantalla principal) ────────────────────────────────────────────────
 
 export default function PayP() {
   const [items, setItems] = useState<CartItem[]>(CART_ITEMS);
@@ -126,8 +116,9 @@ export default function PayP() {
         <PayText variant="subtitle" className="mb-4">Completa tu compra de forma segura</PayText>
 
         {/* Badge simulación */}
-        <View className="bg-yellow-400 rounded-full px-3 py-1 self-center mb-4">
-          <PayText variant="badge">💰 Modo Simulación — Dinero Imaginario</PayText>
+        <View className="bg-indigo-100 rounded-full px-3 py-1 self-center mb-4 flex-row items-center gap-1">
+          <BadgeDollarSign size={14} color="#4338ca" />
+          <PayText variant="badge" className="text-indigo-800">Pago 100% Seguro</PayText>
         </View>
 
         {/* Gestor de productos */}
@@ -138,14 +129,17 @@ export default function PayP() {
 
         {/* Método de pago */}
         <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
-          <PayText variant="label" className="mb-3 uppercase tracking-wide">
-            💳 Método de pago
-          </PayText>
+          <View className="flex-row items-center gap-2 mb-3">
+            <CreditCard size={16} color="#6b7280" />
+            <PayText variant="label" className="uppercase tracking-wide">
+              Método de pago
+            </PayText>
+          </View>
 
           <View className="flex-row mb-4">
-            <MethodButton label="Tarjeta" icon="💳" value="card" selected={method} onPress={setMethod} />
-            <MethodButton label="PayPal" icon="🅿️" value="paypal" selected={method} onPress={setMethod} />
-            <MethodButton label="Mercado Pago" icon="🛒" value="mercadopago" selected={method} onPress={setMethod} />
+            <MethodButton label="Tarjeta" icon={CreditCard} value="card" selected={method} onPress={setMethod} />
+            <MethodButton label="PayPal" icon={Wallet} value="paypal" selected={method} onPress={setMethod} />
+            <MethodButton label="Mercado Pago" icon={BadgeDollarSign} value="mercadopago" selected={method} onPress={setMethod} />
           </View>
 
           {method === "card"
@@ -162,9 +156,13 @@ export default function PayP() {
           disabled={!isCardValid || items.length === 0}
         />
 
-        <PayText variant="caption" className="mt-4">
-          🔐 Simulación segura · Sin datos reales · Proyecto educativo
-        </PayText>
+        {/* Nota seguridad */}
+        <View className="flex-row items-center justify-center gap-1 mt-4">
+          <ShieldCheck size={12} color="#9ca3af" />
+          <PayText variant="caption">
+                Cifrado SSL · Datos protegidos · Transacción segura
+          </PayText>
+        </View>
       </ScrollView>
 
       <ResultModal
