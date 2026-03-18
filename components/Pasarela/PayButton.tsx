@@ -24,7 +24,7 @@ export const PayButton = ({ label, onPress, loading = false, disabled = false }:
         <View className="flex-row items-center">
           <ActivityIndicator color="white" size="small" />
           <Text className="text-white font-bold text-base ml-2">
-            Procesando pago simulado…
+            Procesando pago .....
           </Text>
         </View>
       ) : (
