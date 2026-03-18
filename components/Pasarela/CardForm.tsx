@@ -1,8 +1,8 @@
 import React from "react";
 import { View, TextInput } from "react-native";
+import { Lock } from "lucide-react-native";
 import { PayText } from "./PayText";
 import "@/global.css";
-
 
 export interface CardData {
   number: string;
@@ -83,9 +83,9 @@ export const CardForm = ({ data, onChange }: CardFormProps) => (
     </View>
 
     <View className="flex-row items-center bg-green-50 border border-green-200 rounded-xl px-3 py-2 mt-1">
-      <PayText variant="body" className="text-green-600 mr-2">🔒</PayText>
+      <Lock size={16} color="#16a34a" style={{ marginRight: 8 }} />
       <PayText variant="caption" className="text-green-700 text-left flex-1">
-        Tus datos están protegidos. Esta es una simulación — no se procesa dinero real.
+         Tus datos están cifrados y protegidos. Nunca almacenamos tu información de pago.
       </PayText>
     </View>
   </View>
