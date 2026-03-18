@@ -8,11 +8,31 @@ export default function QRScanner() {
   const handleBarCodeScanned = ({ type, data }: any) => {
     setScanned(true);
 
-    Alert.alert(
-      "Código Scaneado",
-      `Tipo: ${type}\nContenido: ${data}`,
-      [{ text: "OK", onPress: () => setScanned(false) }]
-    );
+    try {
+      const parsed = JSON.parse(data);
+
+      // Verifica que tenga los campos de nuestro QR de pago
+      if (parsed.id && parsed.title && parsed.price) {
+        Alert.alert(
+          "✅ Pago válido",
+          `Producto: ${parsed.title}\nPrecio: $${parsed.price}\nMarca: ${parsed.brand || "N/A"}`,
+          [{ text: "OK", onPress: () => setScanned(false) }]
+        );
+      } else {
+        Alert.alert(
+          "❌ QR no válido",
+          "Este código QR no corresponde a un pago.",
+          [{ text: "Intentar de nuevo", onPress: () => setScanned(false) }]
+        );
+      }
+    } catch {
+      // Si no es JSON, definitivamente no es nuestro QR
+      Alert.alert(
+        "❌ QR no válido",
+        "Este código QR no corresponde a un pago.",
+        [{ text: "Intentar de nuevo", onPress: () => setScanned(false) }]
+      );
+    }
   };
 
   return (
@@ -30,7 +50,6 @@ export default function QRScanner() {
           <Text style={styles.text}>Procesando...</Text>
         </View>
       )}
-
     </View>
   );
 }

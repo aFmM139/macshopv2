@@ -1,6 +1,7 @@
 import { View, Text, Image, Pressable } from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";
+import { Barcode } from "lucide-react-native";
 
 type Props = {
   item: any;
@@ -8,6 +9,18 @@ type Props = {
 
 export default function ProductCard({ item }: Props) {
   const [expanded, setExpanded] = useState(false);
+
+  const handleQR = () => {
+    router.push({
+      pathname: "/(tabs)/Qr",
+      params: {
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        brand: item.brand ?? "",
+      },
+    });
+  };
 
   return (
     <View className="bg-white p-4 mb-4 rounded-2xl">
@@ -24,9 +37,17 @@ export default function ProductCard({ item }: Props) {
         <Text className="text-green-600 font-bold text-base mt-1">${item.price}</Text>
       </Pressable>
 
+      {/* Botón QR */}
+      <Pressable
+        onPress={handleQR}
+        className="mt-3 bg-blue-500 py-2 rounded-xl items-center"
+      >
+        <Text className="text-white font-semibold text-sm"> Generar QR</Text>
+      </Pressable>
+
       <Pressable
         onPress={() => setExpanded((prev) => !prev)}
-        className="mt-3 py-2"
+        className="mt-2 py-2"
       >
         <Text className="text-blue-500 text-sm font-semibold">
           {expanded ? "▲ Ocultar descripción" : "▼ Ver descripción"}
